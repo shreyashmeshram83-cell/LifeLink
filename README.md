@@ -146,7 +146,6 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ---
 
-**Made with ❤️ for emergency blood coordination**
 
 ## Tech Stack
 
@@ -211,13 +210,11 @@ The following are intentionally **not implemented** in this MVP:
 - Organ donation awareness module
 - User authentication and persistent accounts
 - Real-time GPS tracking of donors en route to hospital
-
-## Screenshots
-
-<!-- Add screenshots here -->
+- 
 
 ## Disclaimer
 
 LifeLink is a prototype for emergency donor coordination. Blood compatibility, donor eligibility, transfusion decisions and medical care must be verified by authorized healthcare professionals.
 
 All data in this application is fictional and for demonstration purposes only. No real patient, donor, or hospital data is used.
+**Made with ❤️ for emergency blood coordination**
