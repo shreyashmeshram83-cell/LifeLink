@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database (Supabase local alternative)
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: lifelink
+      POSTGRES_PASSWORD: lifelink_password
+      POSTGRES_DB: lifelink
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  # Backend API
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001"
+    environment:
+      NODE_ENV: development
+      DATABASE_URL: postgresql://lifelink:lifelink_password@postgres:5432/lifelink
+      VITE_SUPABASE_URL: http://postgres:5432
+      JWT_SECRET: dev-secret-key-change-in-production
+      FRONTEND_URL: http://localhost:5173
+    depends_on:
+      - postgres
+    volumes:
+      - ./backend/src:/app/src
+
+  # Frontend (Development)
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    ports:
+      - "5173:5173"
+    environment:
+      VITE_API_URL: http://localhost:3001/api
+    volumes:
+      - ./src:/app/src
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
