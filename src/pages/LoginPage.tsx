@@ -18,37 +18,47 @@ export function LoginPage() {
     setIsLoading(true);
 
     try {
-      // Request location permission
-      await requestLocation();
-      
-      // Validate form
-      if (!name.trim() || !email.trim() || !phone.trim()) {
-        setError('Please fill in all fields');
-        setIsLoading(false);
-        return;
-      }
-
+      // Admin login - only needs email and password
       if (selectedRole === 'admin') {
+        if (!email.trim() || !password.trim()) {
+          setError('Please fill in all fields');
+          setIsLoading(false);
+          return;
+        }
+
         const adminEmail = 'admin@lifelink.com';
         const adminPassword = 'admin123';
 
         if (email.toLowerCase() !== adminEmail || password !== adminPassword) {
-          setError('Admin access requires admin@lifelink.com and password admin123');
+          setError('Invalid admin credentials');
           setIsLoading(false);
           return;
         }
-      }
 
-      // Basic email validation
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(email)) {
-        setError('Please enter a valid email');
-        setIsLoading(false);
-        return;
-      }
+        // For admin, use email as name
+        login(email, email, 'admin', selectedRole);
+      } else {
+        // Other roles - need name, email, phone
+        // Request location permission
+        await requestLocation();
+        
+        if (!name.trim() || !email.trim() || !phone.trim()) {
+          setError('Please fill in all fields');
+          setIsLoading(false);
+          return;
+        }
 
-      // Login user
-      login(name, email, phone, selectedRole);
+        // Basic email validation
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+          setError('Please enter a valid email');
+          setIsLoading(false);
+          return;
+        }
+
+        // Login user
+        login(name, email, phone, selectedRole);
+      }
     } catch (err) {
       setError('Login failed. Please try again.');
       setIsLoading(false);
@@ -80,21 +90,41 @@ export function LoginPage() {
               </div>
             )}
 
-            {/* Full Name */}
-            <div>
-              <label className="block text-sm font-semibold text-ink-900 mb-2">Full Name</label>
-              <div className="relative">
-                <User className="w-5 h-5 text-ink-400 absolute left-3 top-1/2 -translate-y-1/2" />
-                <input
-                  type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="John Doe"
-                  className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-ink-200 focus:border-primary-500 focus:ring-1 focus:ring-primary-500 outline-none transition-all"
-                  disabled={isLoading}
-                />
-              </div>
-            </div>
+            {selectedRole !== 'admin' && (
+              <>
+                {/* Full Name */}
+                <div>
+                  <label className="block text-sm font-semibold text-ink-900 mb-2">Full Name</label>
+                  <div className="relative">
+                    <User className="w-5 h-5 text-ink-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                    <input
+                      type="text"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      placeholder="John Doe"
+                      className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-ink-200 focus:border-primary-500 focus:ring-1 focus:ring-primary-500 outline-none transition-all"
+                      disabled={isLoading}
+                    />
+                  </div>
+                </div>
+
+                {/* Phone */}
+                <div>
+                  <label className="block text-sm font-semibold text-ink-900 mb-2">Phone Number</label>
+                  <div className="relative">
+                    <Phone className="w-5 h-5 text-ink-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                    <input
+                      type="tel"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      placeholder="+91-9876543210"
+                      className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-ink-200 focus:border-primary-500 focus:ring-1 focus:ring-primary-500 outline-none transition-all"
+                      disabled={isLoading}
+                    />
+                  </div>
+                </div>
+              </>
+            )}
 
             {/* Email */}
             <div>
@@ -105,23 +135,7 @@ export function LoginPage() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="you@example.com"
-                  className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-ink-200 focus:border-primary-500 focus:ring-1 focus:ring-primary-500 outline-none transition-all"
-                  disabled={isLoading}
-                />
-              </div>
-            </div>
-
-            {/* Phone */}
-            <div>
-              <label className="block text-sm font-semibold text-ink-900 mb-2">Phone Number</label>
-              <div className="relative">
-                <Phone className="w-5 h-5 text-ink-400 absolute left-3 top-1/2 -translate-y-1/2" />
-                <input
-                  type="tel"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  placeholder="+91-9876543210"
+                  placeholder={selectedRole === 'admin' ? 'admin@lifelink.com' : 'you@example.com'}
                   className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-ink-200 focus:border-primary-500 focus:ring-1 focus:ring-primary-500 outline-none transition-all"
                   disabled={isLoading}
                 />
@@ -157,12 +171,15 @@ export function LoginPage() {
             </div>
 
             {/* Location Permission Notice */}
-            <div className="p-3 rounded-lg bg-blue-50 border border-blue-200">
-              <p className="text-xs text-blue-700">
-                📍 We'll request your location to find nearby hospitals and donors
-              </p>
-            </div>
+            {selectedRole !== 'admin' && (
+              <div className="p-3 rounded-lg bg-blue-50 border border-blue-200">
+                <p className="text-xs text-blue-700">
+                  📍 We'll request your location to find nearby hospitals and donors
+                </p>
+              </div>
+            )}
 
+            {/* Admin Password Field */}
             {selectedRole === 'admin' && (
               <div>
                 <label className="block text-sm font-semibold text-ink-900 mb-2">Admin Password</label>
@@ -190,12 +207,7 @@ export function LoginPage() {
               {isLoading ? 'Signing in...' : 'Sign In'}
             </button>
 
-            {/* Access Info */}
-            <div className="text-center text-xs text-ink-500 pt-4 border-t border-ink-100">
-              <p className="mb-2 font-medium text-ink-600">Admin access</p>
-              <p>Email: admin@lifelink.com</p>
-              <p>Password: admin123</p>
-            </div>
+
           </form>
         </div>
 
