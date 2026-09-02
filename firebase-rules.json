@@ -1,0 +1,39 @@
+{
+  "rules": {
+    "donors": {
+      ".read": "auth != null",
+      ".write": "root.child('users').child(auth.uid).child('role').val() === 'admin' || auth.uid === root.child('donors').child($donor_id).child('user_id').val()",
+      "$donor_id": {
+        ".validate": "newData.hasChildren(['name', 'bloodGroup', 'phone', 'lat', 'lng'])"
+      }
+    },
+    "hospitals": {
+      ".read": "auth != null",
+      ".write": "root.child('users').child(auth.uid).child('role').val() === 'hospital'",
+      "$hospital_id": {
+        ".validate": "newData.hasChildren(['name', 'location', 'lat', 'lng'])"
+      }
+    },
+    "emergency_requests": {
+      ".read": "auth != null",
+      ".write": "auth != null",
+      "$request_id": {
+        ".validate": "newData.hasChildren(['patientName', 'bloodGroup', 'unitsRequired', 'hospital'])"
+      }
+    },
+    "blood_inventory": {
+      ".read": "auth != null",
+      ".write": "root.child('users').child(auth.uid).child('role').val() === 'admin' || root.child('users').child(auth.uid).child('role').val() === 'hospital'",
+      "$blood_group": {
+        ".validate": "newData.hasChildren(['group', 'units', 'status'])"
+      }
+    },
+    "users": {
+      ".read": "auth != null && root.child('users').child(auth.uid).child('role').val() === 'admin' || auth.uid === $uid",
+      ".write": "auth != null && auth.uid === $uid",
+      "$uid": {
+        ".validate": "newData.hasChildren(['email', 'name', 'phone', 'role'])"
+      }
+    }
+  }
+}

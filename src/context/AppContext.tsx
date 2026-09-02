@@ -7,6 +7,12 @@ import type {
   Hospital,
 } from '@/types';
 import { donors as initialDonors, initialRequests } from '@/data/mockData';
+import { 
+  donorService, 
+  hospitalService, 
+  requestService,
+  authService 
+} from '@/lib/firebase';
 
 export type View =
   | 'login'
@@ -141,6 +147,39 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
+  // 🔥 Load data from Firebase (Real-time)
+  useEffect(() => {
+    let unsubscribeDonors: any;
+    let unsubscribeHospitals: any;
+    let unsubscribeRequests: any;
+
+    try {
+      // Subscribe to donors
+      unsubscribeDonors = donorService.subscribe((firebaseDonors) => {
+        setDonors(firebaseDonors.length > 0 ? firebaseDonors : initialDonors);
+      });
+
+      // Subscribe to hospitals
+      unsubscribeHospitals = hospitalService.subscribe((firebaseHospitals) => {
+        setHospitals(firebaseHospitals.length > 0 ? firebaseHospitals : []);
+      });
+
+      // Subscribe to emergency requests
+      unsubscribeRequests = requestService.subscribe((firebaseRequests) => {
+        setRequests(firebaseRequests.length > 0 ? firebaseRequests : initialRequests);
+      });
+    } catch (error) {
+      console.warn('Firebase not configured. Using mock data.', error);
+      // Keep using mock data if Firebase is not set up
+    }
+
+    return () => {
+      if (unsubscribeDonors) unsubscribeDonors();
+      if (unsubscribeHospitals) unsubscribeHospitals();
+      if (unsubscribeRequests) unsubscribeRequests();
+    };
+  }, []);
+
   const currentDonor = donors[0];
 
   const fetchNearbyHospitals = useCallback(async (coords = userLocation ?? DEFAULT_LOCATION) => {
@@ -199,8 +238,17 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const addRequest = useCallback((req: EmergencyRequest) => {
+    // Save to local state
     setRequests((prev) => [req, ...prev]);
     setActiveRequest(req);
+    
+    // Save to Firebase
+    try {
+      requestService.create(req);
+    } catch (error) {
+      console.warn('Failed to save request to Firebase:', error);
+    }
+    
     addSystemNotification(
       'New blood request posted',
       `${req.patientName} needs ${req.component} (${req.bloodGroup}) at ${req.hospital}. All active donors are being notified.`
@@ -215,12 +263,26 @@ export function AppProvider({ children }: { children: ReactNode }) {
       setActiveRequest((prev) =>
         prev && prev.id === id ? { ...prev, status, ...updates } : prev
       );
+      
+      // Update in Firebase
+      try {
+        requestService.updateStatus(id, status, updates);
+      } catch (error) {
+        console.warn('Failed to update request in Firebase:', error);
+      }
     },
     []
   );
 
   const updateDonorAvailability = useCallback((id: string, availability: Donor['availability']) => {
     setDonors((prev) => prev.map((d) => (d.id === id ? { ...d, availability } : d)));
+    
+    // Update in Firebase
+    try {
+      donorService.update(id, { availability });
+    } catch (error) {
+      console.warn('Failed to update donor in Firebase:', error);
+    }
   }, []);
 
   const login = useCallback((name: string, email: string, phone: string, userRole: DemoRole) => {
