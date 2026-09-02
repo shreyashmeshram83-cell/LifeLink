@@ -167,7 +167,7 @@ The complete demo can be experienced in under 3 minutes:
 6. **Request Tracking** — Click "Simulate Donor Acceptance" then "Mark Request Fulfilled"
 7. **Hospital Command Center** — View the fulfilled request in the dashboard
 
-Alternatively, launch as **Hospital** to see the command center, or **Donor** to accept emergency requests.
+Alternatively, launch as **Hospital** to see the command center, or the **Donor** to accept emergency requests.
 
 ## Setup Instructions
 
@@ -192,7 +192,7 @@ The app runs at `http://localhost:5173` by default.
 
 ## Environment Variables
 
-No environment variables are required. The app runs entirely on mock data.
+No environment variables are required. The app run entirely on mock data.
 
 See `.env.example` for optional future configuration placeholders.
 
@@ -204,7 +204,7 @@ The following are intentionally **not implemented** in this MVP:
 - NOTTO integration (National Organ and Tissue Transplant Organisation)
 - Real hospital API integrations
 - Real SMS / WhatsApp notification infrastructure
-- Advanced demand prediction and regional blood shortage forecasting
+- Advanced demand prediction and the regional blood shortage forecasting
 - Multilingual voice assistance
 - Verified NGO network integration
 - Organ donation awareness module
