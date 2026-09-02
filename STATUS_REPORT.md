@@ -31,7 +31,7 @@ Your LifeLink application has been **successfully transformed** from a demo mock
 
 ### 1. Backend Infrastructure ✅
 - **Framework**: Express.js with TypeScript
-- **Database**: PostgreSQL (via Supabase)
+- **Database**: PostgreSQL | Firebase
 - **Authentication**: JWT tokens, bcrypt password hashing
 - **Security**: Helmet.js, CORS, rate limiting (100 req/15 min)
 - **Logging**: Morgan request logging, audit trail
