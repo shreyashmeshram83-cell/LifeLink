@@ -72,7 +72,7 @@ Eliminate delays in emergency blood procurement by connecting verified emergency
 |-------|-----------|----------|
 | Frontend | React + TypeScript + Tailwind CSS | 18+ |
 | Backend | Node.js + Express + TypeScript | 18+ |
-| Database | PostgreSQL (Supabase) | 13+ | Firebase
+| Database | PostgreSQL | 13+ | Firebase
 | Authentication | JWT + bcrypt | - |
 | Containerization | Docker | Latest |
 | Deployment | Railway/Render/Vercel | - |
